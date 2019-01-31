@@ -107,3 +107,57 @@ mean(knn.pred == Direction.2005)   # 0.5  --- K=1 model is very flexible
 knn.pred <- knn(train.X, test.X, train.Direction, k=3)
 table(knn.pred, Direction.2005)
 mean(knn.pred == Direction.2005)   # 0.5357143
+
+
+#### An Application to Carvan Insurance Data ####
+## predict Purchase variable
+library(ISLR)
+dim(Caravan)          # 5822  86
+head(Caravan)
+attach(Caravan)
+summary(Purchase)     # No:5474, Yes:348
+348/(5474+348)        # Only 6% of people purchased caravan insurance
+
+# KNN method - need to standardize predictors
+standardized.X <- scale(Caravan[,-86])
+var(standardized.X[,1])         # check
+mean(standardized.X[,1])
+
+# split the data set
+test <- 1:1000
+train.X <- standardized.X[-test,]
+test.X <- standardized.X[test,]
+train.Y <- Purchase[-test]
+test.Y <- Purchase[test]
+
+set.seed(1)
+knn.pred <- knn(train.X, test.X, train.Y, k=1)
+mean(test.Y != knn.pred)     # 11.8%  - higher than simple model which predict all Purchase = No
+mean(test.Y != "No")
+table(knn.pred, test.Y)     # 9/(68+9) = 0.117
+
+# It semms bad model. But suppose that there is some non-trivial cost to trying to sell insurance
+# to a given individual. If the company tries to sell insurance to a random selection of customers,
+# then the success rate will be only 6%. Instead, the compay would like to try to sell insurance
+# only to customers who are likely to buy it. It means that overall error rate is not of interest.
+# The fraction of individuals that are correctly predicted to buy insurance is of interest!
+
+knn.pred <- knn(train.X, test.X, train.Y, k=3)
+table(knn.pred, test.Y)  
+5 / (21+5)          # 19.231%
+
+knn.pred <- knn(train.X, test.X, train.Y, k=5)
+table(knn.pred, test.Y)  
+4/ (11+4)        # 26.7% 
+
+# Also, we can fit logistic regression model
+glm.fit <- glm(Purchase~., data=Caravan, subset=-test, family=binomial)
+glm.probs <- predict(glm.fit, newdata=Caravan[test,], type='response')
+glm.preds <- rep("No", 1000)
+glm.preds[glm.probs>0.5] <- 'Yes'
+table(glm.preds, test.Y)     # only 7 observation are predicted to yes
+
+glm.preds <- rep('No', 1000)
+glm.preds[glm.probs>0.25] <- 'Yes'  # Change threshold = 0.25
+table(glm.preds, test.Y)
+11 / (22+11)                # predict 33 people will purchase insurance & corret about 33.3%
