@@ -91,7 +91,7 @@ mean(qda.class == Direction.2005) # 0.5992063
 # A matrix containing the predictios associated with the test set, labeled test.X
 # A vector containing the class label for the training set, labeled train.Direction below
 # A value for K, the number of nearest neighbors to be used by the classifier
-#
+
 # We predict Direction using Lag1, Lag2
 
 library(class)
@@ -136,11 +136,11 @@ mean(test.Y != knn.pred)     # 11.8%  - higher than simple model which predict a
 mean(test.Y != "No")
 table(knn.pred, test.Y)     # 9/(68+9) = 0.117
 
-# It semms bad model. But suppose that there is some non-trivial cost to trying to sell insurance
-# to a given individual. If the company tries to sell insurance to a random selection of customers,
-# then the success rate will be only 6%. Instead, the compay would like to try to sell insurance
-# only to customers who are likely to buy it. It means that overall error rate is not of interest.
-# The fraction of individuals that are correctly predicted to buy insurance is of interest!
+# It semms like a bad model. But suppose that there is some non-trivial cost to trying to sell 
+# insurance to a given individual. If the company tries to sell insurance to a random selection of 
+# customers, then the success rate will be only 6%. Instead, the compay would like to try to sell 
+# insurance only to customers who are likely to buy it. It means that overall error rate is not of 
+# interest. The fraction of individuals that are correctly predicted to buy insurance is of interest!
 
 knn.pred <- knn(train.X, test.X, train.Y, k=3)
 table(knn.pred, test.Y)  
