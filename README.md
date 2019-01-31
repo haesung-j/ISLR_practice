@@ -1,2 +1,7 @@
-# ISLR_practice
-Practice for ISLR Labs &amp; Applied
+# ISLR_Practice
+
+This repo is to **practice** ISLR Labs & Applied.
+
+
+# Goal
+The goal is to become familiar with github and to become familiar with R.
