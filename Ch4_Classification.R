@@ -1,3 +1,4 @@
+#### Lab : Classfication ####
 #### Stock Market Data
 library(ISLR)
 names(Smarket)
