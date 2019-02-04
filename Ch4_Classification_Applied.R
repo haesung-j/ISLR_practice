@@ -68,3 +68,73 @@ table(knn.pred, Direction.test)   # (21+32)/104 = 0.5096
 #(h) Which of these methods appears to provide the best results on this data?
 # Logistic regression & LDA
 
+#### 11. Use Auto data ####
+#(a) Create a binary variable, mpg01. use median() to mpg
+library(ISLR)
+head(Auto)
+summary(Auto$mpg)
+
+mpg01 <- rep(0,nrow(Auto))
+mpg01[Auto$mpg>median(Auto$mpg)] <- 1
+Auto <- data.frame(Auto, mpg01)
+
+# Explore the data graphically in order to investigate the association between mpg01 and others.
+attach(Auto)
+cor(Auto[,-9])
+plot(Auto)
+boxplot(mpg01, horsepower)
+boxplot(mpg01, displacement)
+boxplot(mpg01, weight)
+boxplot(mpg01, acceleration)
+
+
+# cylinders displacement weight horsepower have correlate with mpg01
+
+#(c) split the data into a traing set and a test set
+train <- sample(1:nrow(Auto), nrow(Auto)*0.5)
+test <- -train
+Auto.test <- Auto[test,]
+mpg01.test <- mpg01[test]
+
+#(d) Perform LDA on the training data & Compute test error of the model
+library(MASS)
+lda.fit <- lda(mpg01 ~cylinders+displacement+weight+horsepower, data=Auto, subset=train)
+lda.fit
+lda.pred <- predict(lda.fit, newdata=Auto.test)
+lda.class <- lda.pred$class
+table(lda.class, mpg01.test)
+mean(lda.class != mpg01.test)       # test error = 0.1122449
+
+#(e) Perform QDA on the training data & Compute test error of the model
+qda.fit <- qda(mpg01~cylinders+displacement+weight+horsepower, data=Auto, subset=train)
+qda.class <- predict(qda.fit, newdata=Auto.test)$class
+table(qda.class, mpg01.test)
+mean(qda.class != mpg01.test)       # test error = 0.122449
+
+#(f) Perform Logistic reg. on the training data & Compute test error of the model
+glm.fit <- glm(mpg01~cylinders+displacement+weight+horsepower,data=Auto, subset=train,family=binomial)
+glm.probs <- predict(glm.fit, newdata=Auto.test, type='response')
+glm.pred <- rep(0,length(test))
+glm.pred[glm.probs>0.5] <- 1
+table(glm.pred, mpg01.test)
+mean(glm.pred != mpg01.test)       # test error = 0.1071429
+
+# (g) Perform KNN on the training data & Compute test error of the model & select K
+library(class)
+train.X <- cbind(cylinders,displacement,weight,horsepower)[train,]
+test.X  <- cbind(cylinders,displacement,weight,horsepower)[test,]
+train.mpg01 <- mpg01[train]
+
+knn.pred <- knn(train.X, test.X, train.mpg01, k=1)
+mean(knn.pred != mpg01.test)      # test error = 0.127551
+
+knn.pred <- knn(train.X, test.X, train.mpg01, k=2)
+mean(knn.pred != mpg01.test)      # test error = 0.122449
+
+knn.pred <- knn(train.X, test.X, train.mpg01, k=10)
+mean(knn.pred != mpg01.test)      # test error = 0.1428571
+
+knn.pred <- knn(train.X, test.X, train.mpg01, k=50)
+mean(knn.pred != mpg01.test)      # test error = 0.122449
+
+# k=50 or 2 is best
