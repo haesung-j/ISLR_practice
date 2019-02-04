@@ -68,7 +68,7 @@ table(knn.pred, Direction.test)   # (21+32)/104 = 0.5096
 #(h) Which of these methods appears to provide the best results on this data?
 # Logistic regression & LDA
 
-#### 11. Use Auto data ####
+#### 11. Use Auto data - ISLR package ####
 #(a) Create a binary variable, mpg01. use median() to mpg
 library(ISLR)
 head(Auto)
